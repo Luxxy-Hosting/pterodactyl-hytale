@@ -1,5 +1,5 @@
 
-name: build fivem debian egg
+name: build java debian egg
 on:
   workflow_dispatch:
   schedule:
