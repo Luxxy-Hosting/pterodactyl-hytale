@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     tzdata \
     bash \
     openssl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Add Adoptium (Eclipse Temurin) repository
