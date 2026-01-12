@@ -1,0 +1,112 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-01-12T03:17:44+00:00",
+    "name": "Hytale Server",
+    "author": "admin@luxxy.cloud",
+    "description": null,
+    "features": [],
+    "docker_images": {
+        "ghcr.io\/luxxy-gf\/temurin-25:latest": "ghcr.io\/luxxy-gf\/temurin-25:latest"
+    },
+    "file_denylist": [],
+    "startup": ".\/start.sh",
+    "config": {
+        "files": "{}",
+        "startup": "{}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\nset -e\r\n\r\nexport DEBIAN_FRONTEND=noninteractive\r\n\r\necho \"Updating system...\"\r\napt-get update\r\napt-get upgrade -y\r\napt-get install -y curl unzip ca-certificates\r\napt-get autoremove -y\r\napt-get clean\r\nrm -rf \/var\/lib\/apt\/lists\/*",
+            "container": "debian:13-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Assets File Path",
+            "description": "Path to the Hytale assets archive.",
+            "env_variable": "ASSETS_PATH",
+            "default_value": "assets.zip",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Authentication Mode",
+            "description": "Server authentication mode.",
+            "env_variable": "AUTH_MODE",
+            "default_value": "authenticated",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:authenticated,offline",
+            "field_type": "text"
+        },
+        {
+            "name": "Accept Early Plugins",
+            "description": "Allow loading unsupported early plugins.",
+            "env_variable": "ACCEPT_EARLY_PLUGINS",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Allow OP Commands",
+            "description": "Allow operator commands on the server.",
+            "env_variable": "ALLOW_OP",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Enable Backups",
+            "description": "Enable automatic server backups.",
+            "env_variable": "ENABLE_BACKUPS",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Enable Backups",
+            "description": "Enable automatic server backups.",
+            "env_variable": "ENABLE_BACKUPS",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Backup Directory",
+            "description": "Directory where backups will be stored.",
+            "env_variable": "BACKUP_DIR",
+            "default_value": "backups",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Backup Frequency (minutes)",
+            "description": "Automatic backup interval in minutes.",
+            "env_variable": "BACKUP_FREQUENCY",
+            "default_value": "60",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|min:5|max:1440",
+            "field_type": "text"
+        }
+    ]
+}
