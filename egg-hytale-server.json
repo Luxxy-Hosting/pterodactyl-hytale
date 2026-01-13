@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2026-01-12T03:17:44+00:00",
+    "exported_at": "2026-01-13T14:11:50+00:00",
     "name": "Hytale Server",
     "author": "admin@luxxy.cloud",
     "description": null,
@@ -16,7 +16,7 @@
     "startup": ".\/start.sh",
     "config": {
         "files": "{}",
-        "startup": "{}",
+        "startup": "{\r\n    \"done\": \"Hytale Server Booted!\"\r\n}",
         "logs": "{}",
         "stop": "^C"
     },
