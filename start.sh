@@ -4,7 +4,7 @@ set -e
 cd /home/container || exit 1
 
 # ─────────────────────────────────────────────
-# Colors (Pterodactyl-safe)
+# Colors
 # ─────────────────────────────────────────────
 BLUE='\033[1;34m'
 GREEN='\033[1;32m'
@@ -13,7 +13,7 @@ RED='\033[1;31m'
 NC='\033[0m'
 
 # ─────────────────────────────────────────────
-# Defaults / Egg variables
+# Egg variables / defaults
 # ─────────────────────────────────────────────
 SERVER_PORT="${SERVER_PORT:-5520}"
 AUTH_MODE="${AUTH_MODE:-authenticated}"
@@ -22,7 +22,6 @@ BACKUP_DIR="${BACKUP_DIR:-backups}"
 BACKUP_FREQUENCY="${BACKUP_FREQUENCY:-60}"
 
 JAVA_ARGS=()
-
 [ "${ACCEPT_EARLY_PLUGINS}" = "true" ] && JAVA_ARGS+=(--accept-early-plugins)
 [ "${ALLOW_OP}" = "true" ] && JAVA_ARGS+=(--allow-op)
 
@@ -33,7 +32,7 @@ if [ "${ENABLE_BACKUPS}" = "true" ]; then
 fi
 
 # ─────────────────────────────────────────────
-# Ensure downloader exists (silent)
+# Ensure downloader exists
 # ─────────────────────────────────────────────
 if [ ! -f hytale-downloader ]; then
   echo -e "${YELLOW}Hytale downloader not found. Downloading...${NC}"
@@ -44,20 +43,14 @@ if [ ! -f hytale-downloader ]; then
   rm -f hytale-downloader-windows-amd64.exe QUICKSTART.md hytale-downloader.zip >/dev/null 2>&1
 fi
 
-# ─────────────────────────────────────────────
-# Downloader info (non-spammy)
-# ─────────────────────────────────────────────
 echo -e "${BLUE}Hytale Downloader:${NC} $(./hytale-downloader -version 2>/dev/null || echo unknown)"
 ./hytale-downloader -check-update >/dev/null 2>&1 || true
 
 # ─────────────────────────────────────────────
-# Authentication + download logic (FIXED)
+# Download server if missing
 # ─────────────────────────────────────────────
 if [ ! -f Server/HytaleServer.jar ]; then
-  if [ -f .hytale-downloader-credentials.json ]; then
-    echo -e "${GREEN}Hytale authentication already completed.${NC}"
-    echo -e "${YELLOW}Server files missing, re-downloading...${NC}"
-  else
+  if [ ! -f .hytale-downloader-credentials.json ]; then
     echo -e "${YELLOW}Server not installed.${NC}"
     echo -e "${GREEN}Authentication required to download server files.${NC}"
     echo
@@ -68,31 +61,41 @@ if [ ! -f Server/HytaleServer.jar ]; then
     echo
     echo -e "${RED}Do NOT restart the server during authentication.${NC}"
     echo
+  else
+    echo -e "${YELLOW}Server files missing, re-downloading...${NC}"
   fi
 
   ./hytale-downloader --skip-update-check || true
-
-  # Wait ONLY for credentials file (authoritative signal)
-  if [ ! -f .hytale-downloader-credentials.json ]; then
-    echo -e "${YELLOW}Waiting for authentication to complete...${NC}"
-    while [ ! -f .hytale-downloader-credentials.json ]; do
-      echo -e "${BLUE}Waiting for OAuth login...${NC}"
-      sleep 5
-    done
-    echo -e "${GREEN}Authentication completed.${NC}"
-  fi
 fi
 
 # ─────────────────────────────────────────────
-# Sanity checks
+# Find downloaded patch ZIP
+# ─────────────────────────────────────────────
+PATCH_ZIP="$(ls -1 *.zip 2>/dev/null | grep -v Assets.zip | head -n1 || true)"
+
+if [ -z "$PATCH_ZIP" ]; then
+  echo -e "${RED}ERROR: No patch ZIP found after download.${NC}"
+  exit 1
+fi
+
+# ─────────────────────────────────────────────
+# Extract patch ZIP if server not present
 # ─────────────────────────────────────────────
 if [ ! -f Server/HytaleServer.jar ]; then
-  echo -e "${RED}ERROR: Server/HytaleServer.jar not found after download.${NC}"
+  echo -e "${YELLOW}Extracting server files from ${PATCH_ZIP}...${NC}"
+  unzip -oq "$PATCH_ZIP" >/dev/null 2>&1
+fi
+
+# ─────────────────────────────────────────────
+# Final sanity checks
+# ─────────────────────────────────────────────
+if [ ! -f Server/HytaleServer.jar ]; then
+  echo -e "${RED}ERROR: Server/HytaleServer.jar still not found after extraction.${NC}"
   exit 1
 fi
 
 if [ ! -f Assets.zip ]; then
-  echo -e "${RED}ERROR: Assets.zip not found.${NC}"
+  echo -e "${RED}ERROR: Assets.zip not found after extraction.${NC}"
   exit 1
 fi
 
