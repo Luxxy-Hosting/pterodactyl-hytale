@@ -6,6 +6,10 @@ This egg uses the **official Hytale Downloader**, handles **OAuth authentication
 Designed for **game server providers** and **self-hosters** who want a reliable, zero-guesswork setup.
 
 ---
+## Support & Hosting 
+
+Remember we always offer free hosting for hytale and minecraft limited to 3GB Ram And Support @ https://discord.luxxy.cloud
+---
 
 ## 🚀 Features
 
