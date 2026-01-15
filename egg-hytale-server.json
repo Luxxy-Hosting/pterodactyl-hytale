@@ -32,7 +32,7 @@
             "name": "Assets File Path",
             "description": "Path to the Hytale assets archive.",
             "env_variable": "ASSETS_PATH",
-            "default_value": "assets.zip",
+            "default_value": "Assets.zip",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string",
