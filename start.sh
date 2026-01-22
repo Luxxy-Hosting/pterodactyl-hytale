@@ -109,4 +109,5 @@ exec java \
   --bind "0.0.0.0:${SERVER_PORT}" \
   ${EARLY_PLUGINS_FLAG} \
   ${ALLOW_OP_FLAG} \
-  ${BACKUPS_FLAGS}
+  ${BACKUPS_FLAGS} \
+  --transport QUIC
