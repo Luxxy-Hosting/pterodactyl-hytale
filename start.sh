@@ -98,7 +98,7 @@ fi
 # ==============================
 echo "Starting Hytale server..."
 
-exec java \
+printf "\n" | exec java \
   -Xms128M \
   -XX:MaxRAMPercentage=95.0 \
   -Dterminal.jline=false \
