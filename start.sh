@@ -20,29 +20,24 @@ BACKUP_DIR="${BACKUP_DIR:-backups}"
 BACKUP_FREQUENCY="${BACKUP_FREQUENCY:-60}"
 
 # ==============================
-# Resolve toggle flags (0/1)
+# Resolve toggle flags
 # ==============================
 EARLY_PLUGINS_FLAG=""
 ALLOW_OP_FLAG=""
 BACKUPS_FLAGS=""
 
-if [[ "${ACCEPT_EARLY_PLUGINS}" == "1" ]]; then
-  EARLY_PLUGINS_FLAG="--accept-early-plugins"
-fi
+[[ "$ACCEPT_EARLY_PLUGINS" == "1" ]] && EARLY_PLUGINS_FLAG="--accept-early-plugins"
+[[ "$ALLOW_OP" == "1" ]] && ALLOW_OP_FLAG="--allow-op"
 
-if [[ "${ALLOW_OP}" == "1" ]]; then
-  ALLOW_OP_FLAG="--allow-op"
-fi
-
-if [[ "${ENABLE_BACKUPS}" == "1" ]]; then
+if [[ "$ENABLE_BACKUPS" == "1" ]]; then
   BACKUPS_FLAGS="--backup --backup-dir ${BACKUP_DIR} --backup-frequency ${BACKUP_FREQUENCY}"
 fi
 
 # ==============================
-# Ensure Hytale Downloader exists
+# Ensure downloader exists
 # ==============================
 if [[ ! -f "./hytale-downloader" ]]; then
-  echo "Hytale downloader not found. Downloading..."
+  echo "Downloading Hytale downloader..."
   curl -sSL https://downloader.hytale.com/hytale-downloader.zip -o hytale-downloader.zip
   unzip -qo hytale-downloader.zip
   mv hytale-downloader-linux-amd64 hytale-downloader
@@ -51,50 +46,54 @@ if [[ ! -f "./hytale-downloader" ]]; then
 fi
 
 # ==============================
-# Show downloader version & update
+# Show version + update tool
 # ==============================
 ./hytale-downloader -version || true
 ./hytale-downloader -check-update || true
 
 # ==============================
-# Download server if missing
+# Automatic Update Logic
 # ==============================
-if [[ ! -d "./Server" ]]; then
-  echo "Hytale server files not found."
-  echo "Authentication required to download server files."
+echo "Checking for Hytale updates..."
+
+LATEST_VERSION=$(./hytale-downloader -print-version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+
+INSTALLED_VERSION="none"
+[[ -f ".current_version" ]] && INSTALLED_VERSION=$(cat .current_version)
+
+echo "Current: ${INSTALLED_VERSION} | Latest: ${LATEST_VERSION}"
+
+if [[ "$INSTALLED_VERSION" != "$LATEST_VERSION" ]] || [[ ! -d "./Server" ]]; then
+  echo "Updating server files..."
+
   ./hytale-downloader
+
+  if [[ -f "${ASSETS_PATH}" ]]; then
+    echo "Extracting assets..."
+    unzip -qo "${ASSETS_PATH}" -d .
+  fi
+
+  echo "${LATEST_VERSION}" > .current_version
+  echo "Update complete."
+else
+  echo "Server already up to date."
 fi
 
 # ==============================
-# Locate assets ZIP
+# Verify assets + jar
 # ==============================
-if [[ ! -f "${ASSETS_PATH}" ]]; then
-  echo "Assets not found, locating latest patchline..."
-  ASSETS_PATH="$(ls -1 *.zip | head -n 1 || true)"
-fi
-
 if [[ ! -f "${ASSETS_PATH}" ]]; then
   echo "ERROR: Assets ZIP not found."
   exit 1
 fi
 
-echo "Using assets: ${ASSETS_PATH}"
-
-# ==============================
-# Ensure server jar exists
-# ==============================
 if [[ ! -f "./Server/HytaleServer.jar" ]]; then
-  echo "Extracting server files..."
-  unzip -qo "${ASSETS_PATH}" -d .
-fi
-
-if [[ ! -f "./Server/HytaleServer.jar" ]]; then
-  echo "ERROR: HytaleServer.jar not found after extraction."
+  echo "ERROR: HytaleServer.jar missing."
   exit 1
 fi
 
 # ==============================
-# Start the server
+# Start server
 # ==============================
 echo "Starting Hytale server..."
 
