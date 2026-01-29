@@ -97,6 +97,16 @@
             "user_editable": true,
             "rules": "required|integer|min:5|max:1440",
             "field_type": "text"
+        },
+        {
+            "name": "Auto Update",
+            "description": "Automatically check for and download server updates on startup. Set to 1 to enable, 0 to disable.",
+            "env_variable": "AUTO_START",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:0,1",
+            "field_type": "text"
         }
     ]
 }
